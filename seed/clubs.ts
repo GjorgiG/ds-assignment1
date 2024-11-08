@@ -136,6 +136,28 @@ export const clubPlayers: ClubPlayer[] = [
     position: 'Striker'
   },
   {
+    clubId: 2345,
+    playerName: 'Phil Foden',
+    value: 120000000,
+    age: 24,
+    nationality: 'English',
+    appearances: 7,
+    club: 'Manchester City',
+    league: 'Premier League',
+    position: 'Midfielder'
+  },
+  {
+    clubId: 2345,
+    playerName: 'Josko Gvardiol',
+    value: 100000000,
+    age: 22,
+    nationality: 'Croatian',
+    appearances: 10,
+    club: 'Manchester City',
+    league: 'Premier League',
+    position: 'Defender'
+  },
+  {
     clubId: 698991,
     playerName: 'Bukayo Saka',
     value: 150000000,
@@ -145,6 +167,28 @@ export const clubPlayers: ClubPlayer[] = [
     club: 'Arsenal',
     league: 'Premier League',
     position: 'Winger'
+  },
+  {
+    clubId: 698991,
+    playerName: 'Declan Rice',
+    value: 110000000,
+    age: 25,
+    nationality: 'English',
+    appearances: 9,
+    club: 'Arsenal',
+    league: 'Premier League',
+    position: 'Midfielder'
+  },
+  {
+    clubId: 698991,
+    playerName: 'Gabriel Magalhaes',
+    value: 80000000,
+    age: 26,
+    nationality: 'Brazilian',
+    appearances: 10,
+    club: 'Arsenal',
+    league: 'Premier League',
+    position: 'Defender'
   },
   {
     clubId: 1234,
@@ -158,6 +202,28 @@ export const clubPlayers: ClubPlayer[] = [
     position: 'Midfielder'
   },
   {
+    clubId: 1234,
+    playerName: 'Rasmus Hojlund',
+    value: 50000000,
+    age: 21,
+    nationality: 'Danish',
+    appearances: 6,
+    club: 'Manchester United',
+    league: 'Premier League',
+    position: 'Striker'
+  },
+  {
+    clubId: 1234,
+    playerName: 'Noussair Mazraoui',
+    value: 20000000,
+    age: 26,
+    nationality: 'Moroccan',
+    appearances: 10,
+    club: 'Manchester United',
+    league: 'Premier League',
+    position: 'Defender'
+  },
+  {
     clubId: 452540,
     playerName: 'Marc Cucurella',
     value: 50000000,
@@ -169,6 +235,28 @@ export const clubPlayers: ClubPlayer[] = [
     position: 'Defender'
   },
   {
+    clubId: 452540,
+    playerName: 'Enzo Fernandez',
+    value: 60000000,
+    age: 23,
+    nationality: 'Argentinian',
+    appearances: 9,
+    club: 'Chelsea',
+    league: 'Premier League',
+    position: 'Midfielder'
+  },
+  {
+    clubId: 452540,
+    playerName: 'Nicolas Jackson',
+    value: 60000000,
+    age: 23,
+    nationality: 'Senegalese',
+    appearances: 10,
+    club: 'Chelsea',
+    league: 'Premier League',
+    position: 'Striker'
+  },
+  {
     clubId: 583279,
     playerName: 'Bart Verbruggen',
     value: 40000000,
@@ -178,6 +266,28 @@ export const clubPlayers: ClubPlayer[] = [
     club: 'Brighton & Hove Albion',
     league: 'Premier League',
     position: 'Goalkeeper'
+  },
+  {
+    clubId: 583279,
+    playerName: 'Yakuba Minteh',
+    value: 50000000,
+    age: 20,
+    nationality: 'Gambian',
+    appearances: 7,
+    club: 'Brighton & Hove Albion',
+    league: 'Premier League',
+    position: 'Winger'
+  },
+  {
+    clubId: 583279,
+    playerName: 'Ferdi Kadioglu',
+    value: 40000000,
+    age: 25,
+    nationality: 'Turkish',
+    appearances: 6,
+    club: 'Brighton & Hove Albion',
+    league: 'Premier League',
+    position: 'Defender'
   }
 ];
 

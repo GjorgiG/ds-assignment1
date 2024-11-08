@@ -24,7 +24,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       new DeleteCommand({
         TableName: process.env.TABLE_NAME,
         Key: {
-          id: clubId,
+          id: Number(clubId),
         },
       })
     );
