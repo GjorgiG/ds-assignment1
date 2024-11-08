@@ -10,23 +10,23 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     // Print Event
     console.log("[EVENT]", JSON.stringify(event));
     const {pathParameters, queryStringParameters}  = event;
-    const movieId = pathParameters?.movieId ? parseInt(pathParameters.movieId) : undefined;
-    const includeCast = event.queryStringParameters?.cast === 'true';
+    const clubId = pathParameters?.clubId ? parseInt(pathParameters.clubId) : undefined;
+    const includeClubPlayer = event.queryStringParameters?.ClubPlayer === 'true';
 
-    if (!movieId) {
+    if (!clubId) {
       return {
         statusCode: 404,
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify({ Message: "Missing movie Id" }),
+        body: JSON.stringify({ Message: "Missing club Id" }),
       };
     }
 
     const commandOutput = await ddbDocClient.send(
       new GetCommand({
         TableName: process.env.TABLE_NAME,
-        Key: { id: movieId },
+        Key: { id: clubId },
       })
     );
 
@@ -37,29 +37,29 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify({ Message: "Invalid movie Id" }),
+        body: JSON.stringify({ Message: "Invalid club Id" }),
       };
     }
 
-    const body: { data: Record<string, any>; cast?: any[] } = {
+    const body: { data: Record<string, any>; clubPlayer?: any[] } = {
       data: commandOutput.Item,
     };
 
-    if (includeCast) {
-      const castCommandOutput = await ddbDocClient.send(
+    if (includeClubPlayer) {
+      const clubPlayerCommandOutput = await ddbDocClient.send(
         new QueryCommand({
           TableName: process.env.CAST_TABLE_NAME,
-          KeyConditionExpression: "movieId = :movieId",
+          KeyConditionExpression: "clubId = :clubId",
           ExpressionAttributeValues: {
-            ":movieId": movieId,
+            ":clubId": clubId,
           },
         })
       );
 
-      console.log("QueryCommand response: ", castCommandOutput);
+      console.log("QueryCommand response: ", clubPlayerCommandOutput);
       
       
-      body.cast = castCommandOutput.Items || [];
+      body.clubPlayer = clubPlayerCommandOutput.Items || [];
     }
 
     // Return Response

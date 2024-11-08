@@ -1,54 +1,40 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
-import Ajv from "ajv";
-import schema from "../shared/types.schema.json";
-
-const ajv = new Ajv();
-const isValidBodyParams = ajv.compile(schema.definitions["Movie"] || {});
+import { DynamoDBDocumentClient, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 
 const ddbDocClient = createDDbDocClient();
 
 export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   try {
-    // Print Event
     console.log("[EVENT]", JSON.stringify(event));
-    const body = event.body ? JSON.parse(event.body) : undefined;
-    if (!body) {
+
+   
+    const clubId = event.pathParameters?.clubId;
+    if (!clubId) {
       return {
-        statusCode: 500,
+        statusCode: 400,
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify({ message: "Missing request body" }),
+        body: JSON.stringify({ message: "Missing clubId in request path" }),
       };
     }
 
-    if (!isValidBodyParams(body)) {
-        return {
-          statusCode: 500,
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify({
-            message: `Incorrect type. Must match Movie schema`,
-            schema: schema.definitions["Movie"],
-          }),
-        };
-      }
-
-    const commandOutput = await ddbDocClient.send(
-      new PutCommand({
+    const deleteCommandOutput = await ddbDocClient.send(
+      new DeleteCommand({
         TableName: process.env.TABLE_NAME,
-        Item: body,
+        Key: {
+          id: clubId,
+        },
       })
     );
+
     return {
-      statusCode: 201,
+      statusCode: 200,
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ message: "Movie added" }),
+      body: JSON.stringify({ message: "Club deleted" }),
     };
   } catch (error: any) {
     console.log(JSON.stringify(error));
