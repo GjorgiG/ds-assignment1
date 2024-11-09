@@ -5,6 +5,7 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as custom from "aws-cdk-lib/custom-resources";
 import { Construct } from "constructs";
+import { UserPool } from "aws-cdk-lib/aws-cognito";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { generateBatch } from "../shared/util";
 import { clubs, clubPlayers } from "../seed/clubs";
@@ -12,6 +13,19 @@ import { clubs, clubPlayers } from "../seed/clubs";
 export class RestAPIStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+    const userPool = new UserPool(this, "UserPool", {
+      signInAliases: { username: true, email: true },
+      selfSignUpEnabled: true,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    const appClient = userPool.addClient("AppClient", {
+      authFlows: { userPassword: true },
+    });
+
+    const userPoolId = userPool.userPoolId;
+    const userPoolClientId = appClient.userPoolClientId;
 
     // Tables 
     const clubsTable = new dynamodb.Table(this, "ClubsTable", {
@@ -123,7 +137,7 @@ export class RestAPIStack extends cdk.Stack {
             physicalResourceId: custom.PhysicalResourceId.of("clubsddbInitData"), //.of(Date.now().toString()),
           },
           policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
-            resources: [clubsTable.tableArn, clubPlayersTable.tableArn],  // Includes movie cast
+            resources: [clubsTable.tableArn, clubPlayersTable.tableArn],
           }),
         });
         
@@ -148,11 +162,16 @@ export class RestAPIStack extends cdk.Stack {
             allowOrigins: ["*"],
           },
         });
+
+        const authorizer = new apig.CognitoUserPoolsAuthorizer(this, "CognitoAuthorizer", {
+          cognitoUserPools: [userPool],
+        });
     
         const clubsEndpoint = api.root.addResource("clubs");
         clubsEndpoint.addMethod(
           "GET",
-          new apig.LambdaIntegration(getAllClubsFn, { proxy: true })
+          new apig.LambdaIntegration(getAllClubsFn, { proxy: true }),
+          { authorizer, authorizationType: apig.AuthorizationType.COGNITO }
         );
 
         clubsEndpoint.addMethod(
@@ -161,13 +180,15 @@ export class RestAPIStack extends cdk.Stack {
         );
     
         const clubEndpoint = clubsEndpoint.addResource("{clubId}");
+
         clubEndpoint.addMethod(
           "GET",
           new apig.LambdaIntegration(getClubByIdFn, { proxy: true })
         );
         clubEndpoint.addMethod(
           "DELETE",
-          new apig.LambdaIntegration(deleteClubFn, { proxy: true })
+          new apig.LambdaIntegration(deleteClubFn, { proxy: true }),
+          { authorizer, authorizationType: apig.AuthorizationType.COGNITO }
         );
         
         const clubPlayerEndpoint = clubsEndpoint.addResource("players");
@@ -176,9 +197,6 @@ clubPlayerEndpoint.addMethod(
     new apig.LambdaIntegration(getClubPlayerFn, { proxy: true })
 );
 
-       
-        
-        
       }
     }
     

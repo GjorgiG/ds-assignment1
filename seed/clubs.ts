@@ -32,58 +32,10 @@ export const clubs : Club[] = [
     year_founded: 1905
   },
   {
-    id: 844460,
-    city: 'East London',
-    name: 'West Ham',
-    year_founded: 1895
-  },
-  {
-    id: 385950,
-    city: 'South London',
-    name: 'Crystal Palace',
-    year_founded: 1905
-  },
-  {
-    id: 991572,
-    city: 'West London',
-    name: 'Brentford',
-    year_founded: 1889
-  },
-  {
-    id: 650629,
-    city: 'Wolverhampton',
-    name: 'Wolverhampton Wanderers',
-    year_founded: 1877
-  },
-  {
-    id: 921880,
-    city: 'Southampton',
-    name: 'Southampton FC',
-    year_founded: 1885
-  },
-  {
     id: 871711,
     city: 'Liverpool',
     name: 'Liverpool FC',
     year_founded: 1892
-  },
-  {
-    id: 563471,
-    city: 'Liverpool',
-    name: 'Everton',
-    year_founded: 1878
-  },
-  {
-    id: 340467,
-    city: 'Ipswich',
-    name: 'Ipswich Town FC',
-    year_founded: 1878
-  },
-  {
-    id: 947478,
-    city: 'Leicester',
-    name: 'Leicester City',
-    year_founded: 1884
   },
   {
     id: 136141,
@@ -114,12 +66,6 @@ export const clubs : Club[] = [
     city: 'Brighton',
     name: 'Brighton & Hove Albion',
     year_founded: 1901
-  },
-  {
-    id: 492458,
-    city: 'Bournemouth',
-    name: 'AFC Bournemouth',
-    year_founded: 1890
   }
 ]
 
@@ -134,17 +80,6 @@ export const clubPlayers: ClubPlayer[] = [
     club: 'Manchester City',
     league: 'Premier League',
     position: 'Striker'
-  },
-  {
-    clubId: 2345,
-    playerName: 'Phil Foden',
-    value: 120000000,
-    age: 24,
-    nationality: 'English',
-    appearances: 7,
-    club: 'Manchester City',
-    league: 'Premier League',
-    position: 'Midfielder'
   },
   {
     clubId: 2345,
@@ -168,17 +103,7 @@ export const clubPlayers: ClubPlayer[] = [
     league: 'Premier League',
     position: 'Winger'
   },
-  {
-    clubId: 698991,
-    playerName: 'Declan Rice',
-    value: 110000000,
-    age: 25,
-    nationality: 'English',
-    appearances: 9,
-    club: 'Arsenal',
-    league: 'Premier League',
-    position: 'Midfielder'
-  },
+
   {
     clubId: 698991,
     playerName: 'Gabriel Magalhaes',
@@ -200,17 +125,6 @@ export const clubPlayers: ClubPlayer[] = [
     club: 'Manchester United',
     league: 'Premier League',
     position: 'Midfielder'
-  },
-  {
-    clubId: 1234,
-    playerName: 'Rasmus Hojlund',
-    value: 50000000,
-    age: 21,
-    nationality: 'Danish',
-    appearances: 6,
-    club: 'Manchester United',
-    league: 'Premier League',
-    position: 'Striker'
   },
   {
     clubId: 1234,
@@ -236,17 +150,6 @@ export const clubPlayers: ClubPlayer[] = [
   },
   {
     clubId: 452540,
-    playerName: 'Enzo Fernandez',
-    value: 60000000,
-    age: 23,
-    nationality: 'Argentinian',
-    appearances: 9,
-    club: 'Chelsea',
-    league: 'Premier League',
-    position: 'Midfielder'
-  },
-  {
-    clubId: 452540,
     playerName: 'Nicolas Jackson',
     value: 60000000,
     age: 23,
@@ -266,17 +169,6 @@ export const clubPlayers: ClubPlayer[] = [
     club: 'Brighton & Hove Albion',
     league: 'Premier League',
     position: 'Goalkeeper'
-  },
-  {
-    clubId: 583279,
-    playerName: 'Yakuba Minteh',
-    value: 50000000,
-    age: 20,
-    nationality: 'Gambian',
-    appearances: 7,
-    club: 'Brighton & Hove Albion',
-    league: 'Premier League',
-    position: 'Winger'
   },
   {
     clubId: 583279,
