@@ -10,7 +10,9 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     // Print Event
     console.log("[EVENT]", JSON.stringify(event));
     const {pathParameters, queryStringParameters}  = event;
-    const clubId = pathParameters?.clubId ? parseInt(pathParameters.clubId) : undefined;
+    const clubId = event.queryStringParameters?.clubId ? parseInt(event.queryStringParameters.clubId) : undefined;
+    const position = event.queryStringParameters?.position
+    const playerName = event.queryStringParameters?.playerName
     const includeClubPlayer = event.queryStringParameters?.ClubPlayer === 'true';
 
     if (!clubId) {
@@ -45,22 +47,39 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       data: commandOutput.Item,
     };
 
-    if (includeClubPlayer) {
-      const clubPlayerCommandOutput = await ddbDocClient.send(
-        new QueryCommand({
-          TableName: process.env.CAST_TABLE_NAME,
-          KeyConditionExpression: "clubId = :clubId",
-          ExpressionAttributeValues: {
-            ":clubId": clubId,
-          },
-        })
-      );
+    if (position || playerName) {
+      const expressionAttributes: Record<string, any> = {
+        ":clubId": clubId,
+      };
+      const expressionAttributeNames: Record<string, string> = {
+        "#position": "position", 
+      };
+      let filterExpression = "";
+    
 
-      console.log("QueryCommand response: ", clubPlayerCommandOutput);
-      
-      
-      body.clubPlayer = clubPlayerCommandOutput.Items || [];
+    if (position) {
+      expressionAttributes[":position"] = position;
+      filterExpression = "#position = :position";
     }
+
+    if (playerName) {
+      expressionAttributes[":playerName"] = playerName;
+      filterExpression += filterExpression ? "AND playerName = :playerName": "playerName = :playerName";
+    }
+
+    const clubPlayerCommandOutput = await ddbDocClient.send(
+      new QueryCommand({
+        TableName: process.env.CAST_TABLE_NAME,
+        KeyConditionExpression: "clubId = :clubId",
+        ExpressionAttributeValues: expressionAttributes,
+        ExpressionAttributeNames: expressionAttributeNames,
+        FilterExpression: filterExpression || undefined,
+      })
+    );
+
+    console.log("QueryCommand response: ", clubPlayerCommandOutput);
+    body.clubPlayer = clubPlayerCommandOutput.Items || [];
+  }
 
     // Return Response
     return {
