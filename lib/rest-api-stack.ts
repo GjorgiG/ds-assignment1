@@ -6,6 +6,7 @@ import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as custom from "aws-cdk-lib/custom-resources";
 import { Construct } from "constructs";
 import { UserPool } from "aws-cdk-lib/aws-cognito";
+import { AuthApi } from './auth-api'
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { generateBatch } from "../shared/util";
 import { clubs, clubPlayers } from "../seed/clubs";
@@ -26,6 +27,11 @@ export class RestAPIStack extends cdk.Stack {
 
     const userPoolId = userPool.userPoolId;
     const userPoolClientId = appClient.userPoolClientId;
+
+    new AuthApi(this, 'AuthServiceApi', {
+      userPoolId: userPoolId,
+      userPoolClientId: userPoolClientId,
+    });
 
     // Tables 
     const clubsTable = new dynamodb.Table(this, "ClubsTable", {

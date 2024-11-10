@@ -18,7 +18,7 @@ export type ClubPlayer = {
   league: string;
   position: string
 };
-// Used to validate the query string of HTTP Get requests
+
 export type ClubPlayerQueryParams = {
   clubId: string;
   playerName?: string;
