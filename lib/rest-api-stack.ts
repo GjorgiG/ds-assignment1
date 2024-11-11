@@ -155,6 +155,20 @@ export class RestAPIStack extends cdk.Stack {
         clubPlayersTable.grantReadData(getClubPlayerFn);
         clubPlayersTable.grantReadData(getClubByIdFn);
 
+        const requestAuthorizer = new apig.RequestAuthorizer(this, "RequestAuthorizer", {
+          handler: new lambdanode.NodejsFunction(this, "AuthorizerFn", {
+            runtime: lambda.Runtime.NODEJS_18_X,
+            entry: `${__dirname}/../lambdas/auth/authorizer.ts`,
+            environment: {
+              USER_POOL_ID: userPoolId,
+              CLIENT_ID: userPoolClientId,
+              REGION: "eu-west-1",
+            },
+          }),
+          identitySources: [apig.IdentitySource.header("cookie")],
+          resultsCacheTtl: cdk.Duration.minutes(0),
+        });
+
         // REST API
         const api = new apig.RestApi(this, "RestAPI", {
           description: "demo api",
@@ -168,10 +182,6 @@ export class RestAPIStack extends cdk.Stack {
             allowOrigins: ["*"],
           },
         });
-
-        const authorizer = new apig.CognitoUserPoolsAuthorizer(this, "CognitoAuthorizer", {
-          cognitoUserPools: [userPool],
-        });
     
         const clubsEndpoint = api.root.addResource("clubs");
         clubsEndpoint.addMethod(
@@ -181,8 +191,10 @@ export class RestAPIStack extends cdk.Stack {
 
         clubsEndpoint.addMethod(
           "POST",
-          new apig.LambdaIntegration(newClubFn, { proxy: true }),
-          { authorizer, authorizationType: apig.AuthorizationType.COGNITO }
+          new apig.LambdaIntegration(newClubFn, { proxy: true }),{
+          authorizer: requestAuthorizer,
+          authorizationType:apig.AuthorizationType.CUSTOM
+          }
         );
     
         const clubEndpoint = clubsEndpoint.addResource("{clubId}");
@@ -193,8 +205,10 @@ export class RestAPIStack extends cdk.Stack {
         );
         clubEndpoint.addMethod(
           "DELETE",
-          new apig.LambdaIntegration(deleteClubFn, { proxy: true }),
-          { authorizer, authorizationType: apig.AuthorizationType.COGNITO }
+          new apig.LambdaIntegration(deleteClubFn, { proxy: true }),{
+            authorizer: requestAuthorizer,
+            authorizationType:apig.AuthorizationType.CUSTOM
+            }
         );
         
         const clubPlayerEndpoint = clubsEndpoint.addResource("players");
