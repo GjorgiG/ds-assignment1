@@ -10,7 +10,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     // Print Event
     console.log("[EVENT]", JSON.stringify(event));
     const {pathParameters, queryStringParameters}  = event;
-    const clubId = event.queryStringParameters?.clubId ? parseInt(event.queryStringParameters.clubId) : undefined;
+    const clubId = event.pathParameters?.clubId ? parseInt(event.pathParameters.clubId) : undefined;
     const position = event.queryStringParameters?.position
     const playerName = event.queryStringParameters?.playerName
     const includeClubPlayer = event.queryStringParameters?.ClubPlayer === 'true';

@@ -177,12 +177,12 @@ export class RestAPIStack extends cdk.Stack {
         clubsEndpoint.addMethod(
           "GET",
           new apig.LambdaIntegration(getAllClubsFn, { proxy: true }),
-          { authorizer, authorizationType: apig.AuthorizationType.COGNITO }
         );
 
         clubsEndpoint.addMethod(
           "POST",
-          new apig.LambdaIntegration(newClubFn, { proxy: true })
+          new apig.LambdaIntegration(newClubFn, { proxy: true }),
+          { authorizer, authorizationType: apig.AuthorizationType.COGNITO }
         );
     
         const clubEndpoint = clubsEndpoint.addResource("{clubId}");
