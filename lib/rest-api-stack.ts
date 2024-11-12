@@ -90,6 +90,18 @@ export class RestAPIStack extends cdk.Stack {
         }
         );
 
+        const translateClubFn = new lambdanode.NodejsFunction(this, "TranslateClubFn", {
+          architecture: lambda.Architecture.ARM_64,
+          runtime: lambda.Runtime.NODEJS_18_X,
+          entry: `${__dirname}/../lambdas/translateClub.ts`,
+          timeout: cdk.Duration.seconds(10),
+          memorySize: 128,
+          environment: {
+            TABLE_NAME: clubsTable.tableName,
+            REGION: "eu-west-1",
+          },
+        });
+
         const updateClubFn = new lambdanode.NodejsFunction(this, "UpdateClubFn", {
           architecture: lambda.Architecture.ARM_64,
           runtime: lambda.Runtime.NODEJS_18_X,
@@ -162,6 +174,7 @@ export class RestAPIStack extends cdk.Stack {
         // Permissions 
         clubsTable.grantReadData(getClubByIdFn)
         clubsTable.grantReadData(getAllClubsFn)
+        clubsTable.grantReadData(translateClubFn);
         clubsTable.grantReadWriteData(newClubFn)
         clubsTable.grantReadWriteData(deleteClubFn);
         clubsTable.grantReadWriteData(updateClubFn);
@@ -197,6 +210,7 @@ export class RestAPIStack extends cdk.Stack {
         });
     
         const clubsEndpoint = api.root.addResource("clubs");
+
         clubsEndpoint.addMethod(
           "GET",
           new apig.LambdaIntegration(getAllClubsFn, { proxy: true }),
@@ -211,6 +225,12 @@ export class RestAPIStack extends cdk.Stack {
         );
     
         const clubEndpoint = clubsEndpoint.addResource("{clubId}");
+        const translateClubEndpoint = clubEndpoint.addResource("translate");
+
+        translateClubEndpoint.addMethod(
+          "GET",
+          new apig.LambdaIntegration(translateClubFn, { proxy: true })
+        );
 
         clubEndpoint.addMethod(
           "PUT",
