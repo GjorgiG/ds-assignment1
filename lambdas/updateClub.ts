@@ -11,7 +11,6 @@ const ddbDocClient = createDDbDocClient();
 
 export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   try {
-    // Print Event
     console.log("[EVENT]", JSON.stringify(event));
 
     const body = event.body ? JSON.parse(event.body) : undefined;
@@ -34,7 +33,9 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       };
     }
 
+    // extracts the clubId from the path
     const clubId = event.pathParameters?.clubId;
+
     if (!clubId) {
       return {
         statusCode: 400,
@@ -43,6 +44,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       };
     }
 
+    // executes the command to update the club item
     const commandOutput = await ddbDocClient.send(
       new UpdateCommand({
         TableName: process.env.TABLE_NAME,

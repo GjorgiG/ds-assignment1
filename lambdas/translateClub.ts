@@ -8,65 +8,64 @@ const translateClient = new TranslateClient({ region: process.env.REGION });
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   try {
-    const { clubId } = event.pathParameters || {};
-    const language = event.queryStringParameters?.language;
+    const clubId = event.pathParameters?.clubId;
+    const targetLanguage = event.queryStringParameters?.language;
 
     if (!clubId) {
       return { statusCode: 400, body: JSON.stringify({ message: "clubId is required" }) };
     }
 
-    // Get the club data from DynamoDB
-    const clubData = await ddbClient.send(new GetCommand({
+    // retrieve data from DynamoDB
+    const { Item: club } = await ddbClient.send(new GetCommand({
       TableName: process.env.TABLE_NAME,
       Key: { id: parseInt(clubId) },
     }));
 
-    if (!clubData.Item) {
-      return { statusCode: 404, body: JSON.stringify({ message: "club not found" }) };
+    if (!club) {
+      return { statusCode: 404, body: JSON.stringify({ message: "Club not found" }) };
     }
 
-    const club = clubData.Item;
-
-    // If no language parameter is provided, return the club as is
-    if (!language) {
+    
+    if (!targetLanguage) {
       return { statusCode: 200, body: JSON.stringify({ data: club }) };
     }
 
-    // Check if translation already exists in the cache
     const translations = club.translationCache || {};
-    if (!translations[language]) {
-      // Translate the club name if it's not found in cache
+
+    // translate if the translation does not exist in the cache
+    if (!translations[targetLanguage]) {
       const translationResult = await translateClient.send(
         new TranslateTextCommand({
           Text: club.name,
           SourceLanguageCode: 'en',
-          TargetLanguageCode: language,
+          TargetLanguageCode: targetLanguage,
         })
       );
 
       const translatedName = translationResult.TranslatedText || '';
-      
-      // Cache the translated name in DynamoDB
-      const updatedTranslations = { ...translations, [language]: { name: translatedName } };
+
+      // update DynamoDB to cache the translation
+      const updatedTranslations = { ...translations, [targetLanguage]: { name: translatedName } };
       await ddbClient.send(new UpdateCommand({
         TableName: process.env.TABLE_NAME,
         Key: { id: parseInt(clubId) },
-        UpdateExpression: "set translationCache = :translations",
-        ExpressionAttributeValues: { ":translations": updatedTranslations },
-        ReturnValues: "UPDATED_NEW"
+        UpdateExpression: "SET translationCache = :updatedTranslations",
+        ExpressionAttributeValues: { ":updatedTranslations": updatedTranslations },
       }));
 
-      // Update club with the translated name in cache
       club.translationCache = updatedTranslations;
     }
 
-    // Return the club with the translated name if available
-    const responseClub = { ...club, name: club.translationCache[language]?.name || club.name };
+    const responseClub = { ...club, name: club.translationCache[targetLanguage]?.name || club.name };
 
     return { statusCode: 200, body: JSON.stringify({ data: responseClub }) };
 
   } catch (error) {
-    console.error(error);
-    return { statusCode: 500, body: JSON.stringify({ message: "error translating club", error }) };
+    console.error("Error in translating club:", error);
+    return { 
+      statusCode: 500, 
+      body: JSON.stringify({ message: "An error occurred during translation", error }) 
+    };
   }
 };
+

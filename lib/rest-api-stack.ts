@@ -15,12 +15,14 @@ export class RestAPIStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    // userpool setup
     const userPool = new UserPool(this, "UserPool", {
       signInAliases: { username: true, email: true },
       selfSignUpEnabled: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    // client for userpool
     const appClient = userPool.addClient("AppClient", {
       authFlows: { userPassword: true },
     });
@@ -164,7 +166,7 @@ export class RestAPIStack extends cdk.Stack {
                 [clubPlayersTable.tableName]: generateBatch(clubPlayers),  // Added
               },
             },
-            physicalResourceId: custom.PhysicalResourceId.of("clubsddbInitData"), //.of(Date.now().toString()),
+            physicalResourceId: custom.PhysicalResourceId.of("clubsddbInitData"),
           },
           policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
             resources: [clubsTable.tableArn, clubPlayersTable.tableArn],
@@ -174,13 +176,14 @@ export class RestAPIStack extends cdk.Stack {
         // Permissions 
         clubsTable.grantReadData(getClubByIdFn)
         clubsTable.grantReadData(getAllClubsFn)
-        clubsTable.grantReadData(translateClubFn);
+        clubsTable.grantReadWriteData(translateClubFn);
         clubsTable.grantReadWriteData(newClubFn)
         clubsTable.grantReadWriteData(deleteClubFn);
         clubsTable.grantReadWriteData(updateClubFn);
         clubPlayersTable.grantReadData(getClubPlayerFn);
         clubPlayersTable.grantReadData(getClubByIdFn);
 
+        // request authorizer for the API gateway
         const requestAuthorizer = new apig.RequestAuthorizer(this, "RequestAuthorizer", {
           handler: new lambdanode.NodejsFunction(this, "AuthorizerFn", {
             runtime: lambda.Runtime.NODEJS_18_X,
@@ -220,7 +223,7 @@ export class RestAPIStack extends cdk.Stack {
           "POST",
           new apig.LambdaIntegration(newClubFn, { proxy: true }),{
           authorizer: requestAuthorizer,
-          authorizationType:apig.AuthorizationType.CUSTOM
+          authorizationType:apig.AuthorizationType.CUSTOM // added these 2 lines to protect the route
           }
         );
     

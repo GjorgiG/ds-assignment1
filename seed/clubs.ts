@@ -8,6 +8,12 @@ export const clubs : Club[] = [
     year_founded: 1878
   },
   {
+    id: 6789,
+    city: 'This is in English',
+    name: 'This is in Spanish',
+    year_founded: 1878
+  },
+  {
     id: 2345,
     city: 'Manchester',
     name: 'Manchester City',
